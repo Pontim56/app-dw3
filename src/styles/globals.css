@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+.bg1{
+  background-image: url('/images/quadro_mine_1.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg2{
+  background-image: url('/images/quadro_mine_2.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg3{
+  background-image: url('/images/quadro_mine_3.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg4{
+  background-image: url('/images/quadro_mine_4.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg5{
+  background-image: url('/images/quadro_mine_5.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg6{
+  background-image: url('/images/quadro_mine_6.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg7{
+  background-image: url('/images/quadro_mine_7.png');
+  background-size: cover;
+  background-position: center;
+}
+.bg8{
+  background-image: url('/images/quadro_mine_8.png');
+  background-size: cover;
+  background-position: center;
+}
+.bgD{
+  background-image: url('/images/leoDaVinci.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+.bgM{
+  background-image: url('/images/michelangelo.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
