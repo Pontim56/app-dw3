@@ -18,8 +18,8 @@ export default function Home() {
         `}>
             <div className="w-1/5 flex flex-col gap-6 justify-center">
                 <div className="h-30/100">
-                    <div className="h-1/3">
-                        Meu museu
+                    <div className="h-1/3 text-lg">
+                        Museu Moderno de Arte Antiga
                     </div>
                     <div className="h-2/3">
                         <Retangulo1></Retangulo1>

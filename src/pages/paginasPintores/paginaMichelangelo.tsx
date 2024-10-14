@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface Obra {
@@ -45,6 +46,8 @@ export default function PaginaMichelangelo() {
                 const result2Text = await response2.text();
                 const result2 = JSON.parse(result2Text);
                 setPintores(result2);
+
+                
 
                 setLoading(false);
             } catch (error: any) {
@@ -179,11 +182,11 @@ export default function PaginaMichelangelo() {
                     </form>
                 )}
             </div>
-            <a href="/">
+            <Link href="/">
                 <button className='p-2 m-2 mb-5 bg-red-300 rounded text-black '>
                     Voltar
                 </button>
-            </a>
+            </Link>
 
 
         </div>

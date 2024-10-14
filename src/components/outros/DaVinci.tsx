@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function () {
@@ -45,7 +46,7 @@ export default function () {
             w-1/5
             h-1/2
         `}>
-            <a href="/paginasPintores/paginaDaVinci">
+            <Link href="/paginasPintores/paginaDaVinci">
                 {pintores.map((pintor) => (
                     <li className='flex items-center flex-col justify-end h-full te'
                         key={pintor.id_pintor}>
@@ -54,7 +55,7 @@ export default function () {
                         {format(new Date(pintor.ano_nascimento), 'dd/MM/yyyy')} - {format(new Date(pintor.ano_falecimento), 'dd/MM/yyyy')}
                     </li>
                 ))}
-                </a>
+                </Link>
         </div>
     )
 }

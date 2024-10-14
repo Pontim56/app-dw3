@@ -26,14 +26,14 @@ body {
     rgb(var(--background-start-rgb));
 }
 .bg1{
-  background-image: url('/images/quadro_mine_1.png');
+  background-image: url('/imagesDaVinci/obra_4.png');
   background-size: cover;
   background-position: center;
 }
 .bg2{
-  background-image: url('/images/quadro_mine_2.png');
+  /* background-image: url('/images/quadro_mine_2.png');
   background-size: cover;
-  background-position: center;
+  background-position: center; */
 }
 .bg3{
   background-image: url('/images/quadro_mine_3.png');
@@ -46,7 +46,7 @@ body {
   background-position: center;
 }
 .bg5{
-  background-image: url('/images/quadro_mine_5.png');
+  background-image: url('/imagesMichelangelo/obra_2.png');
   background-size: cover;
   background-position: center;
 }

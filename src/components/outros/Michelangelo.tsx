@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Michelangelo() {
@@ -45,7 +46,7 @@ export default function Michelangelo() {
             w-1/5
             h-1/2
         `}>
-            <a href="/paginasPintores/paginaMichelangelo">
+            <Link href="/paginasPintores/paginaMichelangelo">
                 {pintores.map((pintor) => (
                     <li className='flex items-center flex-col justify-end h-full te'
                         key={pintor.id_pintor}>
@@ -54,7 +55,7 @@ export default function Michelangelo() {
                         {format(new Date(pintor.ano_nascimento), 'dd/MM/yyyy')} - {format(new Date(pintor.ano_falecimento), 'dd/MM/yyyy')}
                     </li>
                 ))}
-                </a>
+                </Link>
         </div>
     )
 }

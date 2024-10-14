@@ -23,6 +23,7 @@ const config: Config = {
         '60/100': '60%',
         '1500px': '1500px',
       },
+      
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

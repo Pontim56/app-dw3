@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Retangulo5(){
     return(
@@ -15,7 +16,8 @@ export default function Retangulo5(){
 
             
         ` } >
-            <a href="/basicos/inicialMichelangelo"><Image className="hover:scale-125 transform transition duration-300 ease-in-out" src="/images/arrow-right.png" alt="Seta para a direita" width={40} height={10} /></a>
+        <Link href={"/basicos/inicialMichelangelo"}><Image className="hover:scale-125 transform transition duration-300 ease-in-out" src="/images/arrow-right.png" alt="Seta para a direita" width={40} height={10} /></Link>
+
         </div>
     )
 }
