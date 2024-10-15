@@ -8,7 +8,6 @@ export default function Retangulo1(){
 
             w-full
             h-full
-            bg-gray-400
             flex flex-col justify-between
             rounded-2xl p-4
 

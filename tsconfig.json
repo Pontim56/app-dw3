@@ -16,6 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/api/login/uppLogin.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/api/login/uppLogin.js", "src/pages/api/michelangelo/addComentario.js"],
   "exclude": ["node_modules"]
 }
