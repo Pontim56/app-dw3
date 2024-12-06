@@ -18,7 +18,7 @@ export default function Michelangelo() {
         const fetchData = async () => {
             try {
 
-                const response2 = await fetch('/api/michelangelo/michelangelo');
+                const response2 = await fetch('/api/michelangelo/getMichelangelo');
                 if (!response2.ok) {
                     throw new Error('Erro ao buscar dados');
                 }

@@ -5,9 +5,18 @@ export default async function handler(req, res) {
         try {
             // Consulta SQL para buscar os comentários e o nome da obra correspondente
             const [rows] = await connection.execute(`
-                SELECT comentario.id_comentario, comentario.nota_comentario, obra.nome_obra
-                FROM comentario
-                JOIN obra ON comentario.obra_id_obra = obra.id_obra
+                SELECT 
+    comentario.id_comentario, 
+    comentario.nota_comentario, 
+    obra.nome_obra
+FROM 
+    comentario
+JOIN 
+    obra 
+ON 
+    comentario.obra_id_obra = obra.id_obra
+WHERE 
+    obra.pintor_id_pintor = 1
             `);
             
             res.status(200).json(rows);

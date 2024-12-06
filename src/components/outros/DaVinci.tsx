@@ -18,7 +18,7 @@ export default function () {
         const fetchData = async () => {
             try {
 
-                const response2 = await fetch('/api/davinci/leodavinci');
+                const response2 = await fetch('/api/daVinci/getDaVinci');
                 if (!response2.ok) {
                     throw new Error('Erro ao buscar dados');
                 }
