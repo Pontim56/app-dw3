@@ -1,3 +1,7 @@
+import DaVinci from '@/components/outros/DaVinci';
+import AddBlob from '@/components/universais/AddBlob';
+import BlobS from '@/components/universais/AddBlob';
+import GetBlob from '@/components/universais/GetBlob';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,9 +36,10 @@ export default function PaginaMichelangelo() {
     const [notas, setNotas] = useState<{ [key: number]: number | '' }>({});
     const [medias, setMedias] = useState<{ [key: number]: number }>({});
 
-    const [idObra, setIdObra] = useState<number | string>('');
     const [nomeObra, setNomeObra] = useState('');
     const [dataCriacao, setDataCriacao] = useState('');
+    const [image, setImage] = useState<File | null>(null);
+
 
     const [showForm, setShowForm] = useState(false);
     useEffect(() => {
@@ -130,28 +135,32 @@ export default function PaginaMichelangelo() {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            console.log("Sending data:", { idObra, nomeObra, dataCriacao });
+            // Criar um objeto FormData para enviar os dados e o arquivo
+            const formData = new FormData();
+            formData.append("nome_obra", nomeObra);
+            formData.append("data_criacao", dataCriacao);
+            if (image) {
+                formData.append("image", image); // Certifique-se de que `image` seja um arquivo (File)
+            }
+
+            console.log("Sending data:", { nomeObra, dataCriacao, image });
+
             const response = await fetch('/api/michelangelo/addObraMichelangelo', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    // id_obra: idObra,
-                    nome_obra: nomeObra,
-                    data_criacao: dataCriacao,
-                }),
+                body: formData,
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error response:", errorData);
                 throw new Error(errorData.error || 'Erro ao adicionar obra');
             }
+
             const newObra = await response.json();
             setData([...data, newObra]);
-            // setIdObra('');
             setNomeObra('');
             setDataCriacao('');
+            setImage(null);
         } catch (error: any) {
             console.error("Error:", error);
             setError(error.message);
@@ -173,8 +182,10 @@ export default function PaginaMichelangelo() {
                 {data.map((item, index) => (
                     <div key={item.id_obra} className='flex items-center flex-col w-72  justify-between'>
                         <div>
-                            <Image src={`/imagesMichelangelo/obra_${index + 1}.png`}
-                                alt='aa'
+                            <Image
+                                //  src={`/imagesMichelangelo/obra_${index + 1}.png`}
+                                src={`/api/universal/getBlob?id=${item.id_obra}`}
+                                alt={`Imagem da obra ${item.nome_obra}`}
                                 width={170}
                                 height={100}
                                 className='rounded hover:scale-110 transform transition duration-300 ease-in-out'
@@ -216,16 +227,15 @@ export default function PaginaMichelangelo() {
 
                 {showForm && (
                     <form onSubmit={handleSubmit} className="flex flex-col items-center mt-4 text-black ">
-                        <div className='flex w-full'>
 
-                            {/* <input
-                                className="mb-2 mr-2 p-2 border rounded w-1/5"
-                                type="text"
-                                placeholder="ID"
-                                value={idObra}
-                                onChange={(e) => setIdObra(e.target.value)}
+                        <div className='flex w-full text-green-500'>
+                            <input
+                                type="file"
+                                name='image'
+                                onChange={(e) => setImage(e.target.files?.[0] || null)}
+                                className="mb-2 p-2 border rounded flex-grow"
                                 required
-                            /> */}
+                            />
                             <input
                                 className="mb-2 p-2 border rounded flex-grow"
                                 type="text"
