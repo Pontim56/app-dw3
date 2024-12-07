@@ -1,7 +1,4 @@
 import DaVinci from '@/components/outros/DaVinci';
-import AddBlob from '@/components/universais/AddBlob';
-import BlobS from '@/components/universais/AddBlob';
-import GetBlob from '@/components/universais/GetBlob';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,6 +20,7 @@ interface Comentario {
     id_comentario: number;
     nome_obra: number;
     nota_comentario: number;
+    obra_id_obra: number;
 }
 
 export default function PaginaMichelangelo() {
@@ -34,7 +32,6 @@ export default function PaginaMichelangelo() {
 
     // Adicionamos estados para as notas
     const [notas, setNotas] = useState<{ [key: number]: number | '' }>({});
-    const [medias, setMedias] = useState<{ [key: number]: number }>({});
 
     const [nomeObra, setNomeObra] = useState('');
     const [dataCriacao, setDataCriacao] = useState('');
@@ -47,14 +44,14 @@ export default function PaginaMichelangelo() {
             try {
                 const response = await fetch('/api/michelangelo/getObraMichelangelo');
                 if (!response.ok) {
-                    throw new Error('Erro ao buscar dados');
+                    throw new Error('Erro ao buscar dados getObraMichelangelo');
                 }
                 const result = await response.json();
                 setData(result);
 
                 const response2 = await fetch('/api/michelangelo/getMichelangelo');
                 if (!response2.ok) {
-                    throw new Error('Erro ao buscar dados');
+                    throw new Error('Erro ao buscar dados getMichelangelo');
                 }
                 const result2 = await response2.json();
                 setPintores(result2);
@@ -64,7 +61,9 @@ export default function PaginaMichelangelo() {
                     throw new Error('Erro ao buscar dados');
                 }
                 const result3 = await response3.json();
+                console.log('Comentários recebidos:', result3); // Verifique se obra_id_obra está presente
                 setComentarios(result3);
+
 
                 setLoading(false);
             } catch (error: any) {
@@ -98,12 +97,14 @@ export default function PaginaMichelangelo() {
             const result = await response.json();
             console.log('Nota adicionada com sucesso', result);
 
-            // Aqui você pode limpar o campo ou mostrar uma mensagem de sucesso
+             // Atualizar o estado com a nova nota, igual ao que foi feito no handleSubmit
+            
             setNotas((prevNotas) => {
                 const updatedNotas = { ...prevNotas };
                 delete updatedNotas[idObra];
                 return updatedNotas;
             });
+            // Aqui você pode limpar o campo ou mostrar uma mensagem de sucesso
         } catch (error: any) {
             console.error('Erro ao enviar nota:', error.message);
         }
@@ -129,8 +130,6 @@ export default function PaginaMichelangelo() {
 
     if (loading) return <p>Carregando...</p>;
     if (error) return <p>{`Erro: ${error}`}</p>;
-
-    console.log(medias)
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -180,38 +179,35 @@ export default function PaginaMichelangelo() {
 
             <div className='w-screen list-none flex flex-row flex-wrap justify-center gap-12'>
                 {data.map((item, index) => (
-                    <div key={item.id_obra} className='flex items-center flex-col w-72  justify-between'>
-                        <div>
+                    <div key={item.id_obra} className='flex items-center flex-col w-72 h-96 justify-between'>
+                        <div className='flex flex-col items-center'>
                             <Image
-                                //  src={`/imagesMichelangelo/obra_${index + 1}.png`}
                                 src={`/api/universal/getBlob?id=${item.id_obra}`}
                                 alt={`Imagem da obra ${item.nome_obra}`}
                                 width={170}
                                 height={100}
-                                className='rounded hover:scale-110 transform transition duration-300 ease-in-out'
+                                className='rounded hover:scale-150 transform transition duration-300 ease-in-out'
                             />
-                        </div>
-                        <div className='flex items-center flex-col'>
                             <p>{item.nome_obra}</p>
                             {format(new Date(item.data_criacao), 'yyyy')}
                         </div>
-                        <input
-                            type="number"
-                            placeholder="Nota"
-                            min={0}
-                            max={10}
-                            value={notas[item.id_obra] || ''}
-                            onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
-                            className='mb-2 p-2 border rounded text-black'
-                        />
-
-                        {/* Botão para enviar nota */}
-                        <button
-                            onClick={() => handleNotaSubmit(item.id_obra)}
-                            className="p-2 text-black bg-yellow-100 rounded"
-                        >
-                            Enviar Nota
-                        </button>
+                        <div className='flex items-center flex-col'>
+                            <input
+                                type="number"
+                                placeholder="Nota"
+                                min={0}
+                                max={10}
+                                value={notas[item.id_obra] || ''}
+                                onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
+                                className='mb-2 p-2 border rounded text-black'
+                            />
+                            <button
+                                onClick={() => handleNotaSubmit(item.id_obra)}
+                                className="p-2 text-black bg-yellow-100 rounded"
+                            >
+                                Enviar Nota
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

@@ -30,8 +30,8 @@ export default function PaginaDaVinci() {
 
     const [notas, setNotas] = useState<{ [key: number]: number | '' }>({});
     const [medias, setMedias] = useState<{ [key: number]: number }>({});
-    
-    const [idObra, setIdObra] = useState<number | string>('');
+
+    const [image, setImage] = useState<File | null>(null);
     const [nomeObra, setNomeObra] = useState('');
     const [dataCriacao, setDataCriacao] = useState('');
 
@@ -128,28 +128,32 @@ export default function PaginaDaVinci() {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            console.log("Sending data:", { idObra, nomeObra, dataCriacao });
+            // Criar um objeto FormData para enviar os dados e o arquivo
+            const formData = new FormData();
+            formData.append("nome_obra", nomeObra);
+            formData.append("data_criacao", dataCriacao);
+            if (image) {
+                formData.append("image", image); // Certifique-se de que `image` seja um arquivo (File)
+            }
+
+            console.log("Sending data:", { nomeObra, dataCriacao, image });
+
             const response = await fetch('/api/daVinci/addObraDaVinci', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    // id_obra: idObra,
-                    nome_obra: nomeObra,
-                    data_criacao: dataCriacao,
-                }),
+                body: formData,
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error response:", errorData);
                 throw new Error(errorData.error || 'Erro ao adicionar obra');
             }
+
             const newObra = await response.json();
             setData([...data, newObra]);
-            // setIdObra('');
             setNomeObra('');
             setDataCriacao('');
+            setImage(null);
         } catch (error: any) {
             console.error("Error:", error);
             setError(error.message);
@@ -181,38 +185,37 @@ export default function PaginaDaVinci() {
 
             <div className='w-screen  list-none flex flex-row flex-wrap justify-center gap-12 '>
                 {data.map((item, index) => (
-                    <p key={item.id_obra} className='flex items-center flex-col w-72  justify-between '>
+                    <p key={item.id_obra} className='flex items-center flex-col w-72 h-96 justify-between '>
 
-                        <div >
-                            <Image src={`/imagesDaVinci/obra_${index + 1}.png`}
-                                alt='aa'
+                        <div className='flex flex-col justify-center items-center'>
+                            <Image
+                                src={`/api/universal/getBlob?id=${item.id_obra}`}
+                                alt={`Imagem da obra ${item.nome_obra}`}
                                 width={170}
                                 height={100}
-                                className='rounded hover:scale-110 transform transition duration-300 ease-in-out'
+                                className='rounded hover:scale-150 transform transition duration-300 ease-in-out'
                                 sizes='(max-width: 200px)'
                             />
-                        </div>
-                        <div className='flex items-center flex-col'>
                             <p>{item.nome_obra}</p>
                             {format(new Date(item.data_criacao), 'yyyy')}
                         </div>
-                        <input
-                            type="number"
-                            placeholder="Nota"
-                            min={0}
-                            max={10}
-                            value={notas[item.id_obra] || ''}
-                            onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
-                            className='mb-2 p-2 border rounded text-black'
-                        />
-
-                        {/* Botão para enviar nota */}
-                        <button
-                            onClick={() => handleNotaSubmit(item.id_obra)}
-                            className="p-2 text-black bg-yellow-100 rounded"
-                        >
-                            Enviar Nota
-                        </button>
+                        <div className='flex items-center flex-col'>
+                            <input
+                                type="number"
+                                placeholder="Nota"
+                                min={0}
+                                max={10}
+                                value={notas[item.id_obra] || ''}
+                                onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
+                                className='mb-2 p-2 border rounded text-black'
+                            />
+                            <button
+                                onClick={() => handleNotaSubmit(item.id_obra)}
+                                className="p-2 text-black bg-yellow-100 rounded"
+                            >
+                                Enviar Nota
+                            </button>
+                        </div>
                     </p>
                 ))}
             </div>
@@ -229,16 +232,14 @@ export default function PaginaDaVinci() {
 
                 {showForm && (
                     <form onSubmit={handleSubmit} className="flex flex-col items-center mt-4 text-black ">
-                        <div className='flex w-full'>
-
-                            {/* <input
-                                className="mb-2 mr-2 p-2 border rounded w-1/5"
-                                type="text"
-                                placeholder="ID"
-                                value={idObra}
-                                onChange={(e) => setIdObra(e.target.value)}
+                        <div className='flex w-full text-green-500'>
+                            <input
+                                type="file"
+                                name='image'
+                                onChange={(e) => setImage(e.target.files?.[0] || null)}
+                                className="mb-2 p-2 border rounded flex-grow"
                                 required
-                            /> */}
+                            />
                             <input
                                 className="mb-2 p-2 border rounded flex-grow"
                                 type="text"
