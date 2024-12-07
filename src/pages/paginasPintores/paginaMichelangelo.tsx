@@ -6,9 +6,10 @@ import { useEffect, useState } from 'react';
 
 interface Obra {
     id_obra: number;
-    data_criacao: string;
+    data_criacao: Date;
     nome_obra: string;
     pintor_id_pintor: number;
+    image: Blob;
 }
 interface Pintor {
     id_pintor: number;
@@ -34,11 +35,13 @@ export default function PaginaMichelangelo() {
     const [notas, setNotas] = useState<{ [key: number]: number | '' }>({});
 
     const [nomeObra, setNomeObra] = useState('');
-    const [dataCriacao, setDataCriacao] = useState('');
+    const [dataCriacao, setDataCriacao] = useState<string>("");
     const [image, setImage] = useState<File | null>(null);
 
 
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<number | null>(null); // ID da obra sendo editada
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -97,8 +100,8 @@ export default function PaginaMichelangelo() {
             const result = await response.json();
             console.log('Nota adicionada com sucesso', result);
 
-             // Atualizar o estado com a nova nota, igual ao que foi feito no handleSubmit
-            
+            // Atualizar o estado com a nova nota, igual ao que foi feito no handleSubmit
+
             setNotas((prevNotas) => {
                 const updatedNotas = { ...prevNotas };
                 delete updatedNotas[idObra];
@@ -133,38 +136,76 @@ export default function PaginaMichelangelo() {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        console.log("editingID"+editingId);
         try {
             // Criar um objeto FormData para enviar os dados e o arquivo
             const formData = new FormData();
             formData.append("nome_obra", nomeObra);
             formData.append("data_criacao", dataCriacao);
+
             if (image) {
                 formData.append("image", image); // Certifique-se de que `image` seja um arquivo (File)
             }
 
             console.log("Sending data:", { nomeObra, dataCriacao, image });
 
-            const response = await fetch('/api/michelangelo/addObraMichelangelo', {
-                method: 'POST',
+            const endpoint = editingId
+                ? `/api/michelangelo/uppdateObraMichelangelo?id=${editingId}`
+                : '/api/michelangelo/addObraMichelangelo';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const response = await fetch(endpoint, {
+                method,
                 body: formData,
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error response:", errorData);
                 throw new Error(errorData.error || 'Erro ao adicionar obra');
             }
-
             const newObra = await response.json();
-            setData([...data, newObra]);
+            if (editingId) {
+                setData(data.map((obra) => (obra.id_obra === editingId ? newObra : obra)));
+            } else {
+                setData([...data, newObra]);
+            }
+
             setNomeObra('');
             setDataCriacao('');
             setImage(null);
+            setEditingId(null);
+            setShowForm(false);
         } catch (error: any) {
             console.error("Error:", error);
             setError(error.message);
         }
+
+        //     const newObra = await response.json();
+        //     setData([...data, newObra]);
+        //     setNomeObra('');
+        //     setDataCriacao('');
+        //     setImage(null);
+        // } catch (error: any) {
+        //     console.error("Error:", error);
+        //     setError(error.message);
+        // }
     };
+
+
+    const startEditing = async (data: Obra) => {
+        setNomeObra(data.nome_obra);
+        const date = new Date(data.data_criacao);
+        if (!isNaN(date.getTime())) {
+            setDataCriacao(date.toISOString().split("T")[0]); // Formato YYYY-MM-DD
+        } else {
+            console.error("Data inválida:", data.data_criacao);
+        }
+        setImage(null); // Você pode puxar o arquivo real aqui, se disponível
+        setEditingId(data.id_obra);
+        setShowForm(true);
+    };
+
+
 
     return (
         <div className=" overflow-hidden max-w-screen flex items-center flex-col list-none justify-between">
@@ -191,23 +232,34 @@ export default function PaginaMichelangelo() {
                             <p>{item.nome_obra}</p>
                             {format(new Date(item.data_criacao), 'yyyy')}
                         </div>
-                        <div className='flex items-center flex-col'>
-                            <input
-                                type="number"
-                                placeholder="Nota"
-                                min={0}
-                                max={10}
-                                value={notas[item.id_obra] || ''}
-                                onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
-                                className='mb-2 p-2 border rounded text-black'
-                            />
+                        <div className='flex items-center flex-col gap-2' >
+                            <div className='flex items-center flex-row gap-2'>
+                                <input
+                                    type="number"
+                                    placeholder="Nota"
+                                    min={0}
+                                    max={10}
+                                    value={notas[item.id_obra] || ''}
+                                    onChange={(e) => setNotas({ ...notas, [item.id_obra]: +e.target.value })}
+                                    className=' p-2 border rounded text-black'
+                                />
+                                <button
+                                    onClick={() => handleNotaSubmit(item.id_obra)}
+                                    className=" p-2 text-black bg-yellow-100 rounded"
+                                >
+                                    Enviar Nota
+                                </button>
+                            </div>
                             <button
-                                onClick={() => handleNotaSubmit(item.id_obra)}
-                                className="p-2 text-black bg-yellow-100 rounded"
+                                onClick={() => startEditing(item)}
+                                className="p-2 bg-yellow-200 text-black rounded"
                             >
-                                Enviar Nota
+                                Editar
                             </button>
+
+
                         </div>
+
                     </div>
                 ))}
             </div>
@@ -230,7 +282,7 @@ export default function PaginaMichelangelo() {
                                 name='image'
                                 onChange={(e) => setImage(e.target.files?.[0] || null)}
                                 className="mb-2 p-2 border rounded flex-grow"
-                                required
+                                required={!editingId}
                             />
                             <input
                                 className="mb-2 p-2 border rounded flex-grow"
@@ -250,10 +302,17 @@ export default function PaginaMichelangelo() {
                                 required
                             />
                             <button type="submit" className="p-2 mb-2 bg-yellow-100 rounded flex-grow">
-                                Adicionar Obra
+                                {editingId ? 'Salvar Edição' : 'Adicionar Obra'}
                             </button>
                         </div>
-                        <button className="p-2 bg-yellow-100 rounded text-black w-full" onClick={() => setShowForm(false)}>
+                        <button className="p-2 bg-yellow-100 rounded text-black w-full" 
+                        onClick={() => {
+                            setShowForm(false);
+                            setEditingId(null);
+                            setNomeObra('');
+                            setDataCriacao('');
+                            setImage(null);
+                            }}>
                             Esconder
                         </button>
                     </form>
